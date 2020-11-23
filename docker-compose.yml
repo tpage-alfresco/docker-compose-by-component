@@ -12,3 +12,12 @@ services:
         command: postgres -c max_connections=300 -c log_min_messages=LOG
         ports:
             - 5432:5432
+
+    activemq:
+        image: alfresco/alfresco-activemq:${ACTIVE_MQ_TAG}
+        mem_limit: 1g
+        ports:
+            - 8161:8161 # Web Console
+            - 5672:5672 # AMQP
+            - 61616:61616 # OpenWire
+            - 61613:61613 # STOMP
