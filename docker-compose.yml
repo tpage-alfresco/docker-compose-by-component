@@ -47,8 +47,6 @@ services:
                 -Dalfresco.restApi.basicAuthScheme=true
                 -Xms1500m -Xmx1500m
                 " 
-        ports:
-          - 8081:8080
 
     solr6:
         build:
@@ -133,8 +131,6 @@ services:
                 -Dalfresco.context=alfresco
                 -Dalfresco.protocol=http
                 "
-        ports:
-          - 8082:8080
 
     postgres:
         image: postgres:${POSTGRES_TAG}
@@ -155,6 +151,30 @@ services:
             - 5672:5672 # AMQP
             - 61616:61616 # OpenWire
             - 61613:61613 # STOMP
+
+    content-app:
+        image: quay.io/alfresco/alfresco-digital-workspace:${DIGITAL_WORKSPACE_TAG}
+        mem_limit: 128m
+        environment:
+            BASEPATH: ./
+
+    # HTTP proxy to provide HTTP Default port access to services
+    # SOLR API and SOLR Web Console are protected to avoid unauthenticated access
+    proxy:
+        image: nginx:stable-alpine
+        mem_limit: 128m
+        depends_on:
+            - alfresco
+        volumes:
+            - ./config/nginx.conf:/etc/nginx/nginx.conf
+            - ./config/nginx.htpasswd:/etc/nginx/conf.d/nginx.htpasswd 
+        ports:
+            - 8080:8080  
+        links:
+            - alfresco
+            - share
+            - solr6
+            - content-app
 
 volumes:
     shared-file-store-volume:
