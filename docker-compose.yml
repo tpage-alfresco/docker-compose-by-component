@@ -49,7 +49,26 @@ services:
                 " 
         ports:
           - 8081:8080
-          - 8080:8081
+
+    share:
+        build:
+          context: ./share
+          args:
+            SHARE_TAG: ${SHARE_TAG}
+        mem_limit: 1g
+        environment:
+            REPO_HOST: "alfresco"
+            REPO_PORT: "8080"
+            JAVA_OPTS: "
+                -Xms500m
+                -Xmx500m
+                -Dalfresco.host=localhost
+                -Dalfresco.port=8080
+                -Dalfresco.context=alfresco
+                -Dalfresco.protocol=http
+                "
+        ports:
+          - 8082:8080
 
     postgres:
         image: postgres:${POSTGRES_TAG}
